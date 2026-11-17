@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: traceback
+      POSTGRES_USER: traceback
+      POSTGRES_PASSWORD: traceback
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://traceback:traceback@db:5432/traceback
+      SECRET_KEY: dev-secret-traceback-please-change
+      APP_ENV: development
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+volumes:
+  postgres_data:
